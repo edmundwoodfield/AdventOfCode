@@ -3,6 +3,7 @@ public class CubeBag{
     public double maxObservedRed;
     public double maxObservedGreen;
     public double maxObservedBlue;
+    public double powerOfColours;
     string[] gameArray;
 
 public CubeBag(string gameLine){
@@ -10,6 +11,7 @@ public CubeBag(string gameLine){
     this.gameId = int.Parse(splitGameLine[0].Substring(5));
     this.gameArray = splitGameLine[1].Split(";");
     PopulateMaxObservedValues();
+    this.powerOfColours = this.maxObservedRed * this.maxObservedGreen * this.maxObservedBlue;
 }
 public void PopulateMaxObservedValues(){
     foreach(string hand in gameArray){

@@ -11,12 +11,15 @@ public class Days{
         string[] lines;
         lines = File.ReadAllLines(path);
         double total = 0;
+        double powerTotal = 0;
         foreach(string line in lines){
             CubeBag cubeBag = new CubeBag(line);
+            powerTotal += cubeBag.powerOfColours;
             if(cubeBag.maxObservedRed <= 12 && cubeBag.maxObservedGreen <=13 && cubeBag.maxObservedBlue <= 14){
                 total += cubeBag.gameId;
             }
         }
         Console.WriteLine("The total is " + total);
+        Console.WriteLine("The power total is " + powerTotal);
     }
 }
