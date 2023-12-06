@@ -2,32 +2,41 @@ public class Numbers {
 public static double CalculateTotal(String[] lines){
 double total = 0;
 List<String> numerals = new List<string>();
-foreach (string line in lines){
-            string lineDigits = "";
-            string lineLetters = "";
-    foreach (char character in line){
-                if (char.IsDigit(character)){
-                    CheckLineLetters(ref lineDigits,ref lineLetters);
-                    lineLetters = "";
-                    lineDigits = string.Concat(lineDigits,character);
-                     }
-                else {
-                    lineLetters = string.Concat(lineLetters, character);
-            }
-    CheckLineLetters(ref lineDigits,ref lineLetters);
-    }
-numerals.Add(lineDigits);
-    }
-    foreach(string numeral in numerals){
-    char left = numeral[0];
-    char right = numeral[numeral.Length-1];
-    double tens = char.GetNumericValue(left)*10;
-    double units = char.GetNumericValue(right);
-    total += tens + units;
-    }
-Console.WriteLine("the total is " + total);
+        foreach (string line in lines) numerals.Add(GenerateNumberString(line));
+        foreach (string numeral in numerals) total += GenerateLeftRightNumber(numeral);
+        Console.WriteLine("the total is " + total);
 return total;
 }
+
+    private static double GenerateLeftRightNumber(string numeral)
+    {
+            char left = numeral[0];
+            char right = numeral[numeral.Length - 1];
+            double tens = char.GetNumericValue(left) * 10;
+            double units = char.GetNumericValue(right);
+            return tens + units;
+    }
+
+    private static string GenerateNumberString(string line)
+    {
+        string lineDigits = "";
+        string lineLetters = "";
+        foreach (char character in line)
+        {
+            if (char.IsDigit(character))
+            {
+                CheckLineLetters(ref lineDigits, ref lineLetters);
+                lineLetters = "";
+                lineDigits = string.Concat(lineDigits, character);
+            }
+            else
+            {
+                lineLetters = string.Concat(lineLetters, character);
+            }
+            CheckLineLetters(ref lineDigits, ref lineLetters);
+        }
+        return lineDigits;
+    }
 
     private static void CheckLineLetters(ref string lineDigits, ref string lineLetters)
     {
