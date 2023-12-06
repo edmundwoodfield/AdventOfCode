@@ -1,5 +1,5 @@
 public class Numbers {
-public static double CalculateTotal(String[] lines){
+public static double CalculateDay1Total(String[] lines){
 double total = 0;
 List<String> numerals = new List<string>();
         foreach (string line in lines) numerals.Add(GenerateNumberString(line));

@@ -1,3 +1,3 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-Days.Day1();
+Days.Day2();
