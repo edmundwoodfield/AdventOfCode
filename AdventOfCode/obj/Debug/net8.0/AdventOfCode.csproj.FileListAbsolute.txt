@@ -12,3 +12,4 @@ C:\Users\edmun\Documents\AdventOfCode\AdventOfCode\obj\Debug\net8.0\refint\Adven
 C:\Users\edmun\Documents\AdventOfCode\AdventOfCode\obj\Debug\net8.0\AdventOfCode.pdb
 C:\Users\edmun\Documents\AdventOfCode\AdventOfCode\obj\Debug\net8.0\AdventOfCode.genruntimeconfig.cache
 C:\Users\edmun\Documents\AdventOfCode\AdventOfCode\obj\Debug\net8.0\ref\AdventOfCode.dll
+C:\Users\edmun\Documents\AdventOfCode\AdventOfCode\obj\Debug\net8.0\AdventOfCode.sourcelink.json
