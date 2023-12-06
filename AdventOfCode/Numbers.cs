@@ -33,62 +33,13 @@ return total;
     {
         //this currently repeats the text numeral until the next numeral is found or a later text numeral is found
         //this does not affect the result because the first and last digits are correct
-        if (lineLetters.Contains("one"))
-        {
-            int pos = lineLetters.IndexOf("one");
-            lineLetters = lineLetters.Remove(0,pos);
-            // lineLetters = lineLetters.Replace("one", "");
-            lineDigits = string.Concat(lineDigits, "1");
-        }
-        if (lineLetters.Contains("two"))
-        {int pos = lineLetters.IndexOf("two");
-            lineLetters = lineLetters.Remove(0,pos);
-            // lineLetters = lineLetters.Replace("two", "");
-            lineDigits = string.Concat(lineDigits, "2");
-        }
-        if (lineLetters.Contains("three"))
-        {int pos = lineLetters.IndexOf("three");
-            lineLetters = lineLetters.Remove(0,pos);
-            // lineLetters = lineLetters.Replace("three", "");
-            lineDigits = string.Concat(lineDigits, "3");
-        }
-        if (lineLetters.Contains("four"))
-        {int pos = lineLetters.IndexOf("four");
-            lineLetters = lineLetters.Remove(0,pos);
-            // lineLetters = lineLetters.Replace("four", "");
-            lineDigits = string.Concat(lineDigits, "4");
-        }
-        if (lineLetters.Contains("five"))
-        {int pos = lineLetters.IndexOf("five");
-            lineLetters = lineLetters.Remove(0,pos);
-            // lineLetters = lineLetters.Replace("five", "");
-            lineDigits = string.Concat(lineDigits, "5");
-        }
-        if (lineLetters.Contains("six"))
-        {int pos = lineLetters.IndexOf("six");
-            lineLetters = lineLetters.Remove(0,pos);
-            // lineLetters = lineLetters.Replace("six", "");
-            lineDigits = string.Concat(lineDigits, "6");
-        }
-        if (lineLetters.Contains("seven"))
-        {int pos = lineLetters.IndexOf("seven");
-            lineLetters = lineLetters.Remove(0,pos);
-            // lineLetters = lineLetters.Replace("seven", "");
-            lineDigits = string.Concat(lineDigits, "7");
-        }
-        if (lineLetters.Contains("eight"))
-        {int pos = lineLetters.IndexOf("eight");
-            lineLetters = lineLetters.Remove(0,pos);
-            // lineLetters = lineLetters.Replace("eight", "");
-            lineDigits = string.Concat(lineDigits, "8");
-        }
-        if (lineLetters.Contains("nine"))
-        {int pos = lineLetters.IndexOf("nine");
-            lineLetters = lineLetters.Remove(0,pos);
-            // lineLetters = lineLetters.Replace("nine", "");
-            lineDigits = string.Concat(lineDigits, "9");
+        string[] numberWords = {"one","two","three","four","five","six","seven","eight","nine"};
+        foreach(string numberWord in numberWords){
+            if(lineLetters.Contains(numberWord)){
+                int pos = lineLetters.IndexOf(numberWord);
+                lineLetters = lineLetters.Remove(0,pos);
+                lineDigits = string.Concat(lineDigits,(Array.FindIndex(numberWords, x => x.Contains(numberWord))+1));
+            }
         }
     }
-
-    
 }
