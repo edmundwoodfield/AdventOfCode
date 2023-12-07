@@ -1,3 +1,4 @@
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -124,11 +125,11 @@ return total;
             bool indexMatches = false;
             List<int> numberIndices = GetIndicesOfNumber(number,line);
             foreach(int index in numberIndices){
-                if(validIndices.Contains(index)){
-                    indexMatches = true;
-                    //the following loop removes the number to prevent a later invalid occurence of the same number counting
+                //the following loop removes the number to prevent a later invalid occurence of the same number counting
                     for(int i = 0; i < numberIndices.Count; i++){
                     line = line.Substring(0,numberIndices[i])+"."+line.Substring(numberIndices[i] + 1);}
+                if(validIndices.Contains(index)){
+                    indexMatches = true;                 
                     break;
                 }
             }
@@ -137,5 +138,67 @@ return total;
             }            
         }
         return validNumbers;
+    }
+    public static List<List<int>> GetGearLinesIndexList(string[] lines){
+        List<List<int>> gearLinesIndexList = new List<List<int>>();
+        foreach(string line in lines){
+            string workingLine = line;
+            List<int> indexList = new List<int>();
+            foreach(char character in workingLine){
+            if(char.Equals(character,'*')){
+                int pos = workingLine.IndexOf(character);
+                indexList.Add(pos);
+                //the following line changes the symbol to a . to make sure the next occurence of the symbol is counted
+                workingLine = workingLine.Substring(0,pos)+"."+workingLine.Substring(pos + 1);
+            }
+        }
+        gearLinesIndexList.Add(indexList);
+        }
+        return gearLinesIndexList;
+    }
+
+    public static List<List<int>> FilterToValidGearLinesIndexList(string[] lines){
+        List<List<int>> gearLinesIndexList = GetGearLinesIndexList(lines);
+        int gearLineCounter = 0;
+        List<List<int>> finalGearList = new List<List<int>>();
+        foreach(List<int> gearLineIndexList in gearLinesIndexList){
+            foreach(int gearIndex in gearLineIndexList){
+                List<int> gearIndexList = new List<int>();
+                if(gearIndex != 0){
+                    gearIndexList.Add(gearIndex-1);
+                }
+                gearIndexList.Add(gearIndex);
+                if(gearIndex < lines[gearLineCounter].Length - 1){
+                    gearIndexList.Add(gearIndex+1);
+                }
+                int gearConnections = 0;
+                List<int> gearConnectionsList = new List<int>();
+                if(gearLineCounter != 0){
+                List<int> lineAboveNumberIndices = Numbers.FilterToNumbersWithValidIndices(lines[gearLineCounter -1],gearIndexList);
+                while(lineAboveNumberIndices.Count != 0){
+                    gearConnectionsList.Add(lineAboveNumberIndices[0]);
+                    lineAboveNumberIndices.RemoveAt(0);
+                    gearConnections ++;
+                }
+                }
+                List<int> currentLineNumberIndices = Numbers.FilterToNumbersWithValidIndices(lines[gearLineCounter],gearIndexList);
+                while(currentLineNumberIndices.Count != 0){
+                    gearConnectionsList.Add(currentLineNumberIndices[0]);
+                    currentLineNumberIndices.RemoveAt(0);
+                    gearConnections ++;}
+                if(gearLineCounter < lines.Length - 1){
+                    List<int> lineBelowNumberIndices = Numbers.FilterToNumbersWithValidIndices(lines[gearLineCounter +1],gearIndexList);
+                while(lineBelowNumberIndices.Count != 0){
+                    gearConnectionsList.Add(lineBelowNumberIndices[0]);
+                    lineBelowNumberIndices.RemoveAt(0);
+                    gearConnections ++;
+                }
+                }
+                if(gearConnectionsList.Count == 2){
+                finalGearList.Add(gearConnectionsList);}
+            }
+            gearLineCounter ++;
+        }
+        return finalGearList;
     }
 }

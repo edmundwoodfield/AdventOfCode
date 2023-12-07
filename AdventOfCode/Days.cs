@@ -38,5 +38,16 @@ public class Days{
             }
         }
         Console.WriteLine("The total is " + total);
+        List<List<int>> gearList = Numbers.GetGearLinesIndexList(lines);
+        counter = 0;
+        foreach(List<int> gearLine in gearList){
+            counter ++;
+        }
+        List<List<int>> finalGearList = Numbers.FilterToValidGearLinesIndexList(lines);
+        int gearTotal = 0;
+        foreach(List<int> gear in finalGearList){
+            gearTotal += (gear[0]*gear[1]);
+        }
+        Console.WriteLine("The total of all the gear powers is " + gearTotal);
     }
 }
