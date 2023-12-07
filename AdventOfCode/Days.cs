@@ -22,4 +22,21 @@ public class Days{
         Console.WriteLine("The total is " + total);
         Console.WriteLine("The power total is " + powerTotal);
     }
+
+    public static void Day3(){
+        string path = @"..\..\..\day3input.txt";
+        string[] lines;
+        lines = File.ReadAllLines(path);    
+        List<List<int>> indexList = Numbers.GetIndexLists(lines);
+        int counter = 0;
+        int total = 0;
+        foreach(string line in lines){
+            List<int> validInts = Numbers.FilterToNumbersWithValidIndices(line,indexList[counter]);
+            counter ++;
+            foreach(int validInt in validInts){
+                total += validInt;
+            }
+        }
+        Console.WriteLine("The total is " + total);
+    }
 }
