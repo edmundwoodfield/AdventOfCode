@@ -50,4 +50,17 @@ public class Days{
         }
         Console.WriteLine("The total of all the gear powers is " + gearTotal);
     }
+    public static void Day4(){
+        string path = @"..\..\..\day4input.txt";
+        string[] lines;
+        lines = File.ReadAllLines(path);
+        double totalScratchcardScore = 0;
+        foreach(string line in lines){
+            Scratchcard scratchcard = new Scratchcard(line);
+            if(scratchcard.numberOfMatches !=0){
+                totalScratchcardScore+= Math.Pow(2,scratchcard.numberOfMatches-1);
+            }
+        }
+        Console.WriteLine("The total for the scratchards is " + totalScratchcardScore);
+    }
 }
