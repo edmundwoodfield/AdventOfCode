@@ -50,17 +50,50 @@ public class Days{
         }
         Console.WriteLine("The total of all the gear powers is " + gearTotal);
     }
-    public static void Day4(){
+    public static void Day4()
+    {
         string path = @"..\..\..\day4input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
         double totalScratchcardScore = 0;
-        foreach(string line in lines){
+        foreach (string line in lines)
+        {
             Scratchcard scratchcard = new Scratchcard(line);
-            if(scratchcard.numberOfMatches !=0){
-                totalScratchcardScore+= Math.Pow(2,scratchcard.numberOfMatches-1);
+            if (scratchcard.numberOfMatches != 0)
+            {
+                totalScratchcardScore += Math.Pow(2, scratchcard.numberOfMatches - 1);
             }
         }
-        Console.WriteLine("The total for the scratchards is " + totalScratchcardScore);
+        Console.WriteLine("The total for the scratchcards is " + totalScratchcardScore);
+
+        Dictionary<int, Scratchcard> scratchcards = new Dictionary<int, Scratchcard>();
+        foreach (string line in lines)
+        {
+            Scratchcard scratchcard = new Scratchcard(line);
+            scratchcards.Add(scratchcard.cardNumber, scratchcard);
+        }
+        int totalNumberOfCards = CalculateTotalNumberOfCards(scratchcards);
+        Console.WriteLine("The total number of scratchcards is " + totalNumberOfCards);
+    }
+
+    private static int CalculateTotalNumberOfCards(Dictionary<int, Scratchcard> scratchcards)
+    {
+        int totalNumberOfCards = 0;
+        for (int i = 1; i <= scratchcards.Count; i++)
+        {
+            int counter = 1;
+            while (scratchcards[i].numberOfMatches > 0)
+            {
+                scratchcards[(i + counter)].quantity += scratchcards[i].quantity;
+                scratchcards[i].numberOfMatches--;
+                counter++;
+            }
+        }
+        for (int i = 1; i <= scratchcards.Count; i++)
+        {
+            totalNumberOfCards += scratchcards[i].quantity;
+        }
+
+        return totalNumberOfCards;
     }
 }

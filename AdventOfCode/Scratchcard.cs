@@ -19,6 +19,7 @@ public class Scratchcard{
     public List<int> winningNumbers = new List<int>();
     public List<int> ownNumbers = new List<int>();
     public int numberOfMatches;
+    public int quantity = 1;
     
     private int GenerateMatches(List<int> winning, List<int> own){
         int matchCount = 0;
