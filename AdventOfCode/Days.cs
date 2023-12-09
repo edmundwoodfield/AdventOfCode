@@ -105,6 +105,31 @@ public class Days{
         string[] lines;
         lines = File.ReadAllLines(path);
         string seeds = lines[0];
+        List<double>[] listList = GenerateListList();
+        List<List<double>>[] dataListList = GenerateDataListList();
+        
+        Day5GenerateSeedsPart1(seeds, listList[0]);
+        double lowestLocation = Day5Part1Calculation(lines, listList, dataListList);
+        Console.WriteLine("The lowest location is " + lowestLocation);
+        List<List<double>> part2seeds = Day5GenerateSeedRanges(seeds);
+        Console.WriteLine("test");
+    }
+
+    private static List<List<double>>[] GenerateDataListList()
+    {
+        List<List<double>> seedToSoilData = new List<List<double>>();
+        List<List<double>> soilToFertilizerData = new List<List<double>>();
+        List<List<double>> fertilizerToWaterData = new List<List<double>>();
+        List<List<double>> waterToLightData = new List<List<double>>();
+        List<List<double>> lightToTemperatureData = new List<List<double>>();
+        List<List<double>> temperatureToHumidityData = new List<List<double>>();
+        List<List<double>> humidityToLocationData = new List<List<double>>();
+        return new List<List<double>>[] { seedToSoilData, soilToFertilizerData, fertilizerToWaterData, waterToLightData, lightToTemperatureData, temperatureToHumidityData, humidityToLocationData };
+
+    }
+
+    private static List<double>[] GenerateListList()
+    {
         List<double> seedList = new List<double>();
         List<double> soilList = new List<double>();
         List<double> fertilizerList = new List<double>();
@@ -113,56 +138,92 @@ public class Days{
         List<double> temperatureList = new List<double>();
         List<double> humidityList = new List<double>();
         List<double> locationList = new List<double>();
-        List<double>[] listList = new List<double>[] { seedList, soilList, fertilizerList, waterList, lightList, temperatureList, humidityList, locationList };
+        return new List<double>[] { seedList, soilList, fertilizerList, waterList, lightList, temperatureList, humidityList, locationList };
 
-        MatchCollection winning = Regex.Matches(seeds, "\\d+");
-        foreach (Match match in winning)
+    }
+
+    private static double Day5Part1Calculation(string[] lines, List<double>[] listList, List<List<double>>[] dataListList)
+    {
+        PopulateData(lines, ref dataListList);
+        TraverseLists(listList, dataListList);
+        double lowestLocation = listList[7][0];
+        foreach (double location in listList[7])
         {
-            seedList.Add(double.Parse(match.Value));
-        }
-        List<List<double>> seedToSoilData = new List<List<double>>();
-        List<List<double>> soilToFertilizerData = new List<List<double>>();
-        List<List<double>> fertilizerToWaterData = new List<List<double>>();
-        List<List<double>> waterToLightData = new List<List<double>>();
-        List<List<double>> lightToTemperatureData = new List<List<double>>();
-        List<List<double>> temperatureToHumidityData = new List<List<double>>();
-        List<List<double>> humidityToLocationData = new List<List<double>>();
-        List<List<double>>[] dataListList = new List<List<double>>[] { seedToSoilData, soilToFertilizerData, fertilizerToWaterData, waterToLightData, lightToTemperatureData, temperatureToHumidityData, humidityToLocationData };
-
-        PopulateData(lines, ref seedToSoilData, ref soilToFertilizerData, ref fertilizerToWaterData, ref waterToLightData, ref lightToTemperatureData, ref temperatureToHumidityData, ref humidityToLocationData);
-        TraverseLists(ref listList, dataListList);
-        double lowestLocation = locationList[0];
-        foreach(double location in locationList){
-            if(location< lowestLocation){
+            if (location < lowestLocation)
+            {
                 lowestLocation = location;
             }
         }
-        Console.WriteLine("The lowest location is " + lowestLocation);
+
+        return lowestLocation;
     }
 
-    private static void TraverseLists(ref List<double>[] listList, List<List<double>>[] dataListList)
+    private static void Day5SortLists(List<List<double>>[]dataList)
     {
-        for (int i = 0; i < 7; i++)
-            foreach (double source in listList[i])
-            {
-                bool mapped = false;
-                foreach (List<double> mapLine in dataListList[i])
-                {
-                    if (source >= mapLine[1] && source < mapLine[1] + mapLine[2])
-                    {
-                        double dest = source - mapLine[1] + mapLine[0];
-                        listList[i + 1].Add(dest);
-                        mapped = true;
+        foreach(List<List<double>>unsortedList in dataList){
+            unsortedList.Sort((a,b) => a[0].CompareTo(b[0]));
+            bool rangesComplete = false;
+            while (!rangesComplete){
+                double i = 0;
+                for(int j = 0; j < unsortedList.Count; j++){
+                    if(i < unsortedList[j][0]){
+                        unsortedList.Add(new List<double>{i,i,unsortedList[j][0]-i});
                     }
+                    i = unsortedList[j][0]+unsortedList[j][2]+1;
                 }
-                if (!mapped)
-                {
-                    listList[i + 1].Add(source);
-                }
+                rangesComplete = true;
+                unsortedList.Sort((a,b) => a[0].CompareTo(b[0]));
+            }
             }
     }
 
-    private static void PopulateData(string[] lines, ref List<List<double>> seedToSoil, ref List<List<double>> soilToFertilizer,ref List<List<double>> fertilizerToWater,ref List<List<double>> waterToLight,ref List<List<double>> lightToTemperature,ref List<List<double>> temperatureToHumidity,ref List<List<double>> humidityToLocation)
+
+    private static void Day5GenerateSeedsPart1(string seeds, List<double> seedList)
+    {
+        MatchCollection matches = Regex.Matches(seeds, "\\d+");
+        foreach (Match match in matches)
+        {
+            seedList.Add(double.Parse(match.Value));
+        }
+    }
+
+    private static List<List<double>> Day5GenerateSeedRanges(string seeds){
+        MatchCollection matches = Regex.Matches(seeds, "\\d+");
+        List<List<double>> ranges = new List<List<double>>();
+        List<double> doubles = new List<double>();
+        foreach (Match match in matches)
+        {
+            doubles.Add(double.Parse(match.Value));
+        }
+        for(int i = 0; i < doubles.Count; i+=2){
+            double bottom = doubles[i];
+            double top = doubles[i]+doubles[i+1];
+            ranges.Add(new List<double>{bottom,top});
+        }
+        return ranges;
+    }
+
+    private static string TraverseLists(List<double>[] listList, List<List<double>>[] dataListList)
+    {
+        string path = "";
+        for (int i = 0; i < dataListList.Length; i++){
+            foreach (double source in listList[i]){
+                int pathCounter = 0;
+                foreach (List<double> mapLine in dataListList[i]){
+                    if (source >= mapLine[1] && source < mapLine[1] + mapLine[2]){
+                        double dest = source - mapLine[1] + mapLine[0];
+                        listList[i + 1].Add(dest);
+                        path = string.Concat(path,pathCounter);
+
+                    }
+                    pathCounter ++;
+                }
+            }
+        }
+        return path;
+    }
+
+    private static void PopulateData(string[] lines, ref List<List<double>>[] dataListList)
     {
         int seedToSoilIndex = 0;
         int soilToFertilizerIndex = 0;
@@ -171,93 +232,52 @@ public class Days{
         int lightToTemperatureIndex = 0;
         int temperatureToHumidityIndex = 0;
         int humidityToLocationIndex = 0;
+        int endIndex = 0;
+        List<int> indices = new List<int>{seedToSoilIndex,soilToFertilizerIndex,fertilizerToWaterIndex,waterToLightIndex,lightToTemperatureIndex,temperatureToHumidityIndex,humidityToLocationIndex,endIndex};
         for (int i = 1; i < lines.Length; i++)
         {
             if (lines[i].Contains("seed-to-soil map:"))
             {
-                seedToSoilIndex = i;
+                indices[0] = i;
             }
             if (lines[i].Contains("soil-to-fertilizer map:"))
             {
-                soilToFertilizerIndex = i;
+                indices[1] = i;
             }
             if (lines[i].Contains("fertilizer-to-water map:"))
             {
-                fertilizerToWaterIndex = i;
+                indices[2] = i;
             }
             if (lines[i].Contains("water-to-light map:"))
             {
-                waterToLightIndex = i;
+                indices[3] = i;
             }
             if (lines[i].Contains("light-to-temperature map:"))
             {
-                lightToTemperatureIndex = i;
+                indices[4] = i;
             }
             if (lines[i].Contains("temperature-to-humidity map:"))
             {
-                temperatureToHumidityIndex = i;
+                indices[5] = i;
             }
             if (lines[i].Contains("humidity-to-location map:"))
             {
-                humidityToLocationIndex = i;
+                indices[6] = i;
+            }
+            indices[7] = lines.Length+1;
+        }
+        for( int j = 0; j < indices.Count - 1; j++){
+            for(int i = indices[j]; i < indices[j+1] -1; i++){
+                List<double> mapLine = new List<double>();
+                MatchCollection matches = Regex.Matches(lines[i],"\\d+");
+                foreach(Match match in matches){
+                    mapLine.Add(double.Parse(match.Value));
+                }
+                if(mapLine.Count != 0){
+                    dataListList[j].Add(mapLine);}
             }
         }
-        for(int i = seedToSoilIndex + 1; i < soilToFertilizerIndex -1; i++){
-            List<double> mapLine = new List<double>();
-            MatchCollection matches = Regex.Matches(lines[i],"\\d+");
-            foreach(Match match in matches){
-                mapLine.Add(double.Parse(match.Value));
-            }
-            seedToSoil.Add(mapLine);
-        }
-        for(int i = soilToFertilizerIndex + 1; i < fertilizerToWaterIndex -1; i++){
-            List<double> mapLine = new List<double>();
-            MatchCollection matches = Regex.Matches(lines[i],"\\d+");
-            foreach(Match match in matches){
-                mapLine.Add(double.Parse(match.Value));
-            }
-            soilToFertilizer.Add(mapLine);
-        }
-        for(int i = fertilizerToWaterIndex + 1; i < waterToLightIndex -1; i++){
-            List<double> mapLine = new List<double>();
-            MatchCollection matches = Regex.Matches(lines[i],"\\d+");
-            foreach(Match match in matches){
-                mapLine.Add(double.Parse(match.Value));
-            }
-            fertilizerToWater.Add(mapLine);
-        }
-        for(int i = waterToLightIndex + 1; i < lightToTemperatureIndex -1; i++){
-            List<double> mapLine = new List<double>();
-            MatchCollection matches = Regex.Matches(lines[i],"\\d+");
-            foreach(Match match in matches){
-                mapLine.Add(double.Parse(match.Value));
-            }
-            waterToLight.Add(mapLine);
-        }
-        for(int i = lightToTemperatureIndex + 1; i < temperatureToHumidityIndex -1; i++){
-            List<double> mapLine = new List<double>();
-            MatchCollection matches = Regex.Matches(lines[i],"\\d+");
-            foreach(Match match in matches){
-                mapLine.Add(double.Parse(match.Value));
-            }
-            lightToTemperature.Add(mapLine);
-        }
-        for(int i = temperatureToHumidityIndex + 1; i < humidityToLocationIndex -1; i++){
-            List<double> mapLine = new List<double>();
-            MatchCollection matches = Regex.Matches(lines[i],"\\d+");
-            foreach(Match match in matches){
-                mapLine.Add(double.Parse(match.Value));
-            }
-            temperatureToHumidity.Add(mapLine);
-        }
-        for(int i = humidityToLocationIndex + 1; i < lines.Length; i++){
-            List<double> mapLine = new List<double>();
-            MatchCollection matches = Regex.Matches(lines[i],"\\d+");
-            foreach(Match match in matches){
-                mapLine.Add(double.Parse(match.Value));
-            }
-            humidityToLocation.Add(mapLine);
-        }
+        Day5SortLists(dataListList);
     }
     
 }
