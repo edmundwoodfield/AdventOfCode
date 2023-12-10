@@ -1,1 +1,1 @@
-﻿    Days.Day5();
+﻿    Days.Day6();

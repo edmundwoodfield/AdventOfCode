@@ -316,4 +316,39 @@ public class Days{
         Day5SortLists(dataListList);
     }
     
+    public static void Day6(){
+        string path = @"..\..\..\day6input.txt";
+        string[] lines;
+        lines = File.ReadAllLines(path);
+        List<List<double>> races = GenerateRaces(lines);
+        List<int> numberOfPossibleVictories = CalculateNumberOfPossibleVictories(races);
+        double productOfPossibleVictories = 1;
+        for(int i = 0; i < numberOfPossibleVictories.Count; i ++){
+            productOfPossibleVictories *= numberOfPossibleVictories[i];
+        }
+        Console.WriteLine("the product of all the possible victories is " + productOfPossibleVictories);
+    }
+    private static List<List<double>> GenerateRaces(string[] lines){
+        List<List<double>> races = new List<List<double>>();
+        MatchCollection times = Regex.Matches(lines[0],"\\d+");
+        MatchCollection distances = Regex.Matches(lines[1],"\\d+");
+        for(int i = 0; i < times.Count; i++){
+        races.Add(new List<double>{double.Parse(times[i].Value),double.Parse(distances[i].Value)});}
+        return races;
+    }
+    private static List<int> CalculateNumberOfPossibleVictories(List<List<double>> races){
+        List<int> numberOfPossibleVictories = new List<int>();
+        foreach(List<double> race in races){
+            int counter = 0;
+            double time = race[0];
+            double distance = race[1];
+            for(int buttonTime = 1; buttonTime < distance; buttonTime++){
+                if((time-buttonTime)*buttonTime > distance){
+                    counter++;
+                }
+            }
+            numberOfPossibleVictories.Add(counter);
+        }
+        return numberOfPossibleVictories;
+    }
 }
