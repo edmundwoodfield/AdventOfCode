@@ -107,7 +107,7 @@ public class Days{
         string seeds = lines[0];
         List<double>[] listList = GenerateListList();
         List<List<double>>[] dataListList = GenerateDataListList();
-        PopulateData(lines, ref dataListList);
+        Day5PopulateData(lines, ref dataListList);
         Day5GenerateSeedsPart1(seeds, listList[0]);
         double lowestLocation = Day5Part1Calculation(listList, dataListList);
         Console.WriteLine("The lowest location is " + lowestLocation);
@@ -116,10 +116,11 @@ public class Days{
         while (part2Seeds.Count > 0) {
             List<double>[] Part2ListList = GenerateListList();
             Part2ListList[0] = part2Seeds[0];
-            List<string> rangeCheck = Day5Part2Calculation(Part2ListList,dataListList);
-            if(rangeCheck[0].Equals("true")){
-                if(part2LowestLocation == null || double.Parse(rangeCheck[1])< part2LowestLocation){
-                    part2LowestLocation = double.Parse(rangeCheck[1]);
+            bool rangeCheck = false;
+            double workingLowestLocation = Day5Part2Calculation(Part2ListList,dataListList, ref rangeCheck);
+            if(rangeCheck){
+                if(part2LowestLocation == null || workingLowestLocation < part2LowestLocation){
+                    part2LowestLocation = workingLowestLocation;
                 };
             }
             else{
@@ -168,8 +169,19 @@ public class Days{
 
     private static double Day5Part1Calculation(List<double>[] listList, List<List<double>>[] dataListList)
     {
-        TraverseLists(listList, dataListList);
-        double lowestLocation = listList[7][0];
+    bool dummyBool = false;
+    return Day5Part2Calculation(listList,dataListList, ref dummyBool);
+    }
+    private static double Day5Part2Calculation(List<double>[] listList, List<List<double>>[] dataListList, ref bool singlePath)
+    {
+        double lowestLocation = 0;
+        if(TraverseLists(listList, dataListList)){
+            singlePath = true;
+        }
+        else{
+            singlePath = false;
+        }
+        lowestLocation = listList[7][0];
         foreach (double location in listList[7])
         {
             if (location < lowestLocation)
@@ -178,27 +190,6 @@ public class Days{
             }
         }
         return lowestLocation;
-    }
-    private static List<string> Day5Part2Calculation(List<double>[] listList, List<List<double>>[] dataListList)
-    {
-        List<string> pathsAndLowestLocation = new List<string>();
-        if(TraverseLists(listList, dataListList)){
-            pathsAndLowestLocation.Add("true");
-        }
-        else{
-            pathsAndLowestLocation.Add("false");
-        }
-        double lowestLocation = listList[7][0];
-        foreach (double location in listList[7])
-        {
-            if (location < lowestLocation)
-            {
-                lowestLocation = location;
-            }
-        }
-        pathsAndLowestLocation.Add("" + lowestLocation);
-
-        return pathsAndLowestLocation;
     }
     
 
@@ -268,7 +259,7 @@ public class Days{
         return singlePath;
     }
 
-    private static void PopulateData(string[] lines, ref List<List<double>>[] dataListList)
+    private static void Day5PopulateData(string[] lines, ref List<List<double>>[] dataListList)
     {
         int seedToSoilIndex = 0;
         int soilToFertilizerIndex = 0;
