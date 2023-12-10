@@ -107,12 +107,36 @@ public class Days{
         string seeds = lines[0];
         List<double>[] listList = GenerateListList();
         List<List<double>>[] dataListList = GenerateDataListList();
-        
+        PopulateData(lines, ref dataListList);
         Day5GenerateSeedsPart1(seeds, listList[0]);
-        double lowestLocation = Day5Part1Calculation(lines, listList, dataListList);
+        double lowestLocation = Day5Part1Calculation(listList, dataListList);
         Console.WriteLine("The lowest location is " + lowestLocation);
-        List<List<double>> part2seeds = Day5GenerateSeedRanges(seeds);
-        Console.WriteLine("test");
+        List<List<double>> part2Seeds = Day5GenerateSeedRanges(seeds);
+        double? part2LowestLocation = null;
+        while (part2Seeds.Count > 0) {
+            List<double>[] Part2ListList = GenerateListList();
+            Part2ListList[0] = part2Seeds[0];
+            List<string> rangeCheck = Day5Part2Calculation(Part2ListList,dataListList);
+            if(rangeCheck[0].Equals("true")){
+                if(part2LowestLocation == null || double.Parse(rangeCheck[1])< part2LowestLocation){
+                    part2LowestLocation = double.Parse(rangeCheck[1]);
+                };
+            }
+            else{
+                double diff = part2Seeds[0][1]-part2Seeds[0][0];
+                if (diff == 1){
+                part2Seeds.Add(new List<double>{part2Seeds[0][0],part2Seeds[0][0]});
+                part2Seeds.Add(new List<double>{part2Seeds[0][1],part2Seeds[0][1]});
+                }
+                else
+                {if (diff % 2 == 1){diff ++;}
+                double halfDiff = diff/2;
+                part2Seeds.Add(new List<double>{part2Seeds[0][0],part2Seeds[0][0]+halfDiff});
+                part2Seeds.Add(new List<double>{part2Seeds[0][0]+halfDiff+1,part2Seeds[0][1]});}
+            }
+            part2Seeds.RemoveAt(0);
+        }
+        Console.WriteLine("the lowest location for part 2 is " + part2LowestLocation);
     }
 
     private static List<List<double>>[] GenerateDataListList()
@@ -142,9 +166,8 @@ public class Days{
 
     }
 
-    private static double Day5Part1Calculation(string[] lines, List<double>[] listList, List<List<double>>[] dataListList)
+    private static double Day5Part1Calculation(List<double>[] listList, List<List<double>>[] dataListList)
     {
-        PopulateData(lines, ref dataListList);
         TraverseLists(listList, dataListList);
         double lowestLocation = listList[7][0];
         foreach (double location in listList[7])
@@ -154,9 +177,30 @@ public class Days{
                 lowestLocation = location;
             }
         }
-
         return lowestLocation;
     }
+    private static List<string> Day5Part2Calculation(List<double>[] listList, List<List<double>>[] dataListList)
+    {
+        List<string> pathsAndLowestLocation = new List<string>();
+        if(TraverseLists(listList, dataListList)){
+            pathsAndLowestLocation.Add("true");
+        }
+        else{
+            pathsAndLowestLocation.Add("false");
+        }
+        double lowestLocation = listList[7][0];
+        foreach (double location in listList[7])
+        {
+            if (location < lowestLocation)
+            {
+                lowestLocation = location;
+            }
+        }
+        pathsAndLowestLocation.Add("" + lowestLocation);
+
+        return pathsAndLowestLocation;
+    }
+    
 
     private static void Day5SortLists(List<List<double>>[]dataList)
     {
@@ -203,24 +247,25 @@ public class Days{
         return ranges;
     }
 
-    private static string TraverseLists(List<double>[] listList, List<List<double>>[] dataListList)
+    private static bool TraverseLists(List<double>[] listList, List<List<double>>[] dataListList)
     {
-        string path = "";
+        List<int> pathAndLocation = new List<int>();
+        bool singlePath = false;
         for (int i = 0; i < dataListList.Length; i++){
             foreach (double source in listList[i]){
-                int pathCounter = 0;
                 foreach (List<double> mapLine in dataListList[i]){
-                    if (source >= mapLine[1] && source < mapLine[1] + mapLine[2]){
+                    if (source >= mapLine[1] && source <= mapLine[1] + mapLine[2]){
                         double dest = source - mapLine[1] + mapLine[0];
                         listList[i + 1].Add(dest);
-                        path = string.Concat(path,pathCounter);
-
                     }
-                    pathCounter ++;
                 }
             }
+        
         }
-        return path;
+        if(listList[0][0] == listList[0][1] || listList[7][0]-listList[0][0] == listList[7][1]-listList[0][1]){
+            singlePath = true;
+        }
+        return singlePath;
     }
 
     private static void PopulateData(string[] lines, ref List<List<double>>[] dataListList)
