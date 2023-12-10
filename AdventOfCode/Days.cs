@@ -320,18 +320,86 @@ public class Days{
         string path = @"..\..\..\day6input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
-        List<List<double>> races = GenerateRaces(lines);
+        List<List<double>> races = GenerateRaces(lines,1);
         List<int> numberOfPossibleVictories = CalculateNumberOfPossibleVictories(races);
         double productOfPossibleVictories = 1;
         for(int i = 0; i < numberOfPossibleVictories.Count; i ++){
             productOfPossibleVictories *= numberOfPossibleVictories[i];
         }
         Console.WriteLine("the product of all the possible victories is " + productOfPossibleVictories);
+        List<List<double>> racesPart2 = GenerateRaces(lines,2);
+        List<double> possibleVictories = new List<double>();
+        foreach (List<double> race in racesPart2) {possibleVictories.Add(BulkCalculateNumberOfPossibleVictories(race));}
+        Console.WriteLine("the number of possibile victories is " + possibleVictories[0]);
+
     }
-    private static List<List<double>> GenerateRaces(string[] lines){
+
+    private static double BulkCalculateNumberOfPossibleVictories(List<double> race)
+    {
+        double time = race[0];
+        double distance = race[1];
+        double bottomPossibility = 1;
+        double topPossibility = time - 1;
+        bool complete = false;
+        double lowestKnown = time;
+        double highestFailure = 0;
+        do
+        {
+
+            if ((time - bottomPossibility - 1) * (bottomPossibility - 1) <= distance && (time - bottomPossibility) * bottomPossibility > distance)
+            {
+                complete = true;
+                break;
+            }
+            if ((time - bottomPossibility) * bottomPossibility > distance)
+            {
+                lowestKnown = bottomPossibility;
+                bottomPossibility = lowestKnown - Math.Round((lowestKnown - highestFailure) / 2);
+            }
+            if ((time - bottomPossibility) * bottomPossibility <= distance)
+            {
+                highestFailure = bottomPossibility;
+                bottomPossibility = highestFailure + Math.Round((lowestKnown - highestFailure) / 2);
+            }
+        }
+        while (!complete);
+        complete = false;
+        double highestKnown = bottomPossibility;
+        double lowestFailure = time;
+        do
+        {
+
+            if ((time - (topPossibility + 1)) * (topPossibility + 1) <= distance && (time - topPossibility) * topPossibility > distance)
+            {
+                complete = true;
+                break;
+            }
+            if ((time - topPossibility) * topPossibility > distance)
+            {
+                highestKnown = topPossibility;
+                topPossibility = highestKnown + Math.Round((lowestFailure - highestKnown) / 2);
+            }
+            if ((time - topPossibility) * topPossibility <= distance)
+            {
+                lowestFailure = topPossibility;
+                topPossibility = lowestFailure - Math.Round((lowestFailure - highestKnown) / 2);
+            }
+        }
+        while (!complete);
+        return topPossibility-bottomPossibility+1;
+    }
+
+    private static List<List<double>> GenerateRaces(string[] lines, int part){
         List<List<double>> races = new List<List<double>>();
-        MatchCollection times = Regex.Matches(lines[0],"\\d+");
-        MatchCollection distances = Regex.Matches(lines[1],"\\d+");
+        MatchCollection times = null;
+        MatchCollection distances = null;
+        if(part != 2){
+            times = Regex.Matches(lines[0],"\\d+");
+            distances = Regex.Matches(lines[1],"\\d+");}
+        if(part == 2){
+            times = Regex.Matches(lines[0].Replace(" ",""),"\\d+");
+            distances = Regex.Matches(lines[1].Replace(" ",""),"\\d+");
+        }
         for(int i = 0; i < times.Count; i++){
         races.Add(new List<double>{double.Parse(times[i].Value),double.Parse(distances[i].Value)});}
         return races;
