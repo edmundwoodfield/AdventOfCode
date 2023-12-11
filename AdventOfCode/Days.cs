@@ -419,4 +419,20 @@ public class Days{
         }
         return numberOfPossibleVictories;
     }
+    public static void Day7(){
+        string path = @"..\..\..\day7input.txt";
+        string[] lines;
+        lines = File.ReadAllLines(path);
+        List<CamelCard> hands = new List<CamelCard>();
+        foreach(string line in lines){
+            hands.Add(new CamelCard(line));
+        }
+        hands.Sort();
+        double totalWinnings = 0;
+        for(int i = 0; i < hands.Count; i++){
+            totalWinnings += hands[i].bid*(i+1);
+        }
+        Console.WriteLine("The total winngs is " + totalWinnings);
+
+    }
 }
