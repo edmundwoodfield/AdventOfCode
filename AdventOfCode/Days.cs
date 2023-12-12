@@ -400,8 +400,10 @@ public class Days{
             times = Regex.Matches(lines[0].Replace(" ",""),"\\d+");
             distances = Regex.Matches(lines[1].Replace(" ",""),"\\d+");
         }
-        for(int i = 0; i < times.Count; i++){
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        for (int i = 0; i < times.Count; i++){
         races.Add(new List<double>{double.Parse(times[i].Value),double.Parse(distances[i].Value)});}
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
         return races;
     }
     private static List<int> CalculateNumberOfPossibleVictories(List<List<double>> races){
@@ -432,7 +434,7 @@ public class Days{
         for(int i = 0; i < hands.Count; i++){
             totalWinnings += hands[i].bid*(i+1);
         }
-        Console.WriteLine("The total winngs is " + totalWinnings);
+        Console.WriteLine(value: "The total winnings is " + totalWinnings);
 
     }
 }
