@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 
 public class Days{
@@ -444,10 +445,95 @@ public class Days{
         lines = File.ReadAllLines(path);
         string direction = lines[0];
         Dictionary<string, List<string>> nodeMap = GenerateNodeMap(lines);
-        Console.WriteLine("The number of steps taken is " + CalculateSteps(direction, nodeMap, "AAA", "ZZZ"));
+        Console.WriteLine("The number of steps taken for part 1 is " + CalculateStepsDay8Part1(direction, nodeMap, "AAA", "ZZZ"));
+        List<string> startingNodes = new List<string>();
+        foreach (string location in nodeMap.Keys)
+        {
+            if (location[2] == 'A')
+            {
+                startingNodes.Add(location);
+            }
+        }
+        Console.WriteLine("The number of steps taken for part 2 is " + CalculateStepsDay8Part2(direction, nodeMap, startingNodes));
     }
 
-    private static int CalculateSteps(string direction, Dictionary<string, List<string>> nodeMap, string startLocation, string endLocation)
+    private static double CalculateLowestCommonMultiple(List<int> numbersToFactorise)
+    {
+        List<Dictionary<int, int>> primeFactorsList = GeneratePrimeFactorsList(numbersToFactorise);
+        Dictionary<int, int> factors = new Dictionary<int, int>();
+        for (int i = 0; i < primeFactorsList.Count; i++)
+        {
+            foreach (int factor in primeFactorsList[i].Keys)
+            {
+                if (!factors.ContainsKey(factor))
+                {
+                    factors.Add(factor, primeFactorsList[i].GetValueOrDefault(factor));
+                }
+                else if (factors.GetValueOrDefault(factor) < primeFactorsList[i].GetValueOrDefault(factor))
+                {
+                    factors.Add(factor, primeFactorsList[i].GetValueOrDefault(factor));
+                }
+
+            }
+        }
+        double total = 1;
+        foreach (int key in factors.Keys)
+        {
+            total *= key * factors.GetValueOrDefault(key);
+        }
+
+        return total;
+    }
+
+    private static List<Dictionary<int, int>> GeneratePrimeFactorsList(List<int> numbersToFactorise)
+    {
+        List<Dictionary<int, int>> primeFactorsList = new List<Dictionary<int, int>>();
+        foreach (int numberToFactorise in numbersToFactorise)
+        {
+            int workingInt = numberToFactorise;
+            Dictionary<int, int> primeFactors = new Dictionary<int, int>();
+            for (int i = 2; i < workingInt / 2; i++)
+            {
+                while (workingInt % i == 0)
+                {
+                    primeFactors.Add(i, primeFactors.GetValueOrDefault(i, 0) + 1);
+                    primeFactors.Add(workingInt / i, primeFactors.GetValueOrDefault(workingInt / i, 0) + 1);
+                    workingInt = workingInt / i;
+                }
+            }
+            primeFactorsList.Add(primeFactors);
+        }
+
+        return primeFactorsList;
+    }
+
+    private static double CalculateStepsDay8Part2(string direction, Dictionary<string, List<string>> nodeMap, List<string> startingNodes){
+        int counter = 0;
+        int fullCounters = 0;
+        List<int> stepsToZ = new List<int>();
+        foreach(string startNode in startingNodes){
+            counter = 0;
+            fullCounters = 0;
+            string location = startNode;
+            do{
+            if (direction[counter] == 'L')
+        {
+            location = nodeMap.GetValueOrDefault(location, new List<string>())[0];
+        }
+        else { location = nodeMap.GetValueOrDefault(location, new List<string>())[1]; }
+        counter++;
+        if (counter >= direction.Length)
+        {
+            fullCounters++;
+            counter = 0;
+        }}
+        while(location[2] != 'Z');        
+        stepsToZ.Add(fullCounters * direction.Length + counter);
+        }
+        return CalculateLowestCommonMultiple(stepsToZ);
+    }
+
+    private static int CalculateStepsDay8Part1(string direction, Dictionary<string, List<string>> nodeMap, string startLocation, string endLocation)
     {
         int counter = 0;
         int fullCounters = 0;
