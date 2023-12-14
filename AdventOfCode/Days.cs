@@ -437,33 +437,50 @@ public class Days{
         Console.WriteLine(value: "The total winnings is " + totalWinnings);
 
     }
-    public static void Day8(){
+    public static void Day8()
+    {
         string path = @"..\..\..\day8input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
         string direction = lines[0];
-        Dictionary<string,List<string>> nodeMap = new Dictionary<string, List<string>>();
-        for(int i = 2; i < lines.Length; i++){
-            string key = lines[i].Split("=")[0].Trim();
-            string left = lines[i].Split("=")[1].Substring(2,3);
-            string right = lines[i].Split("=")[1].Substring(7,3);
-            nodeMap.Add(key, new List<string>{left,right});
-        }
+        Dictionary<string, List<string>> nodeMap = GenerateNodeMap(lines);
+        Console.WriteLine("The number of steps taken is " + CalculateSteps(direction, nodeMap, "AAA", "ZZZ"));
+    }
+
+    private static int CalculateSteps(string direction, Dictionary<string, List<string>> nodeMap, string startLocation, string endLocation)
+    {
         int counter = 0;
         int fullCounters = 0;
-        string location = "AAA";
-        do{
-            if(direction[counter] == 'L'){
-                location = nodeMap.GetValueOrDefault(location,new List<string>())[0];
+        string location = startLocation;
+        do
+        {
+            if (direction[counter] == 'L')
+            {
+                location = nodeMap.GetValueOrDefault(location, new List<string>())[0];
             }
-            else{location = nodeMap.GetValueOrDefault(location,new List<string>())[1];}
-            counter ++;
-            if (counter >= direction.Length){
-                fullCounters ++;
+            else { location = nodeMap.GetValueOrDefault(location, new List<string>())[1]; }
+            counter++;
+            if (counter >= direction.Length)
+            {
+                fullCounters++;
                 counter = 0;
             }
         }
-        while (location != "ZZZ");
-        Console.WriteLine("The number of steps taken is " + (fullCounters*direction.Length + counter));
+        while (location != endLocation);
+        return fullCounters * direction.Length + counter;
+    }
+
+    private static Dictionary<string, List<string>> GenerateNodeMap(string[] lines)
+    {
+        Dictionary<string, List<string>> nodeMap = new Dictionary<string, List<string>>();
+        for (int i = 2; i < lines.Length; i++)
+        {
+            string key = lines[i].Split("=")[0].Trim();
+            string left = lines[i].Split("=")[1].Substring(2, 3);
+            string right = lines[i].Split("=")[1].Substring(7, 3);
+            nodeMap.Add(key, new List<string> { left, right });
+        }
+
+        return nodeMap;
     }
 }
