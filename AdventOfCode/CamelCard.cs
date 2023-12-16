@@ -71,10 +71,11 @@ public class CamelCard : IComparable{
     public int CompareTo(object? obj)
     {
         if (obj == null) return 1;
+        else{
         CamelCard? otherHand = obj as CamelCard;
-        if(this.type > otherHand.type) return 1;
-        if(this.type < otherHand.type) return -1;
-        if(this.type == otherHand.type){
+        if(this.type > otherHand!.type) return 1;
+        if(this.type < otherHand!.type) return -1;
+        if(this.type == otherHand!.type){
             for(int cardOrder = 0; cardOrder < hand.Count; cardOrder++){
                 if(this.hand[cardOrder] > otherHand.hand[cardOrder]) return 1;
                 if(this.hand[cardOrder] < otherHand.hand[cardOrder]) return -1;
@@ -82,5 +83,5 @@ public class CamelCard : IComparable{
             return 0;
         }
         return 0;
-    }
+    }}
 }

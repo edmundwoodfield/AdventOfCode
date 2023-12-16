@@ -3,14 +3,14 @@ using System.Text.RegularExpressions;
 
 public class Days{
     public static void Day1(){
-        string path = @"..\..\..\day1input.txt";
+        string path = @"..\..\..\inputs\day1input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
         Numbers.CalculateDay1Total(lines);
     }
 
     public static void Day2(){
-        string path = @"..\..\..\day2input.txt";
+        string path = @"..\..\..\inputs\day2input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
         double total = 0;
@@ -27,7 +27,7 @@ public class Days{
     }
 
     public static void Day3(){
-        string path = @"..\..\..\day3input.txt";
+        string path = @"..\..\..\inputs\day3input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);    
         List<List<int>> indexList = Numbers.GetIndexLists(lines);
@@ -55,7 +55,7 @@ public class Days{
     }
     public static void Day4()
     {
-        string path = @"..\..\..\day4input.txt";
+        string path = @"..\..\..\inputs\day4input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
         double totalScratchcardScore = 0;
@@ -102,7 +102,7 @@ public class Days{
 
     public static void Day5()
     {
-        string path = @"..\..\..\day5input.txt";
+        string path = @"..\..\..\inputs\day5input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
         string seeds = lines[0];
@@ -318,7 +318,7 @@ public class Days{
     }
     
     public static void Day6(){
-        string path = @"..\..\..\day6input.txt";
+        string path = @"..\..\..\inputs\day6input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
         List<List<double>> races = GenerateRaces(lines,1);
@@ -392,8 +392,8 @@ public class Days{
 
     private static List<List<double>> GenerateRaces(string[] lines, int part){
         List<List<double>> races = new List<List<double>>();
-        MatchCollection times = null;
-        MatchCollection distances = null;
+        MatchCollection? times = null;
+        MatchCollection? distances = null;
         if(part != 2){
             times = Regex.Matches(lines[0],"\\d+");
             distances = Regex.Matches(lines[1],"\\d+");}
@@ -401,10 +401,8 @@ public class Days{
             times = Regex.Matches(lines[0].Replace(" ",""),"\\d+");
             distances = Regex.Matches(lines[1].Replace(" ",""),"\\d+");
         }
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        for (int i = 0; i < times.Count; i++){
-        races.Add(new List<double>{double.Parse(times[i].Value),double.Parse(distances[i].Value)});}
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        for (int i = 0; i < times!.Count; i++){
+        races.Add(new List<double>{double.Parse(times[i].Value),double.Parse(distances![i].Value)});}
         return races;
     }
     private static List<int> CalculateNumberOfPossibleVictories(List<List<double>> races){
@@ -423,7 +421,7 @@ public class Days{
         return numberOfPossibleVictories;
     }
     public static void Day7(){
-        string path = @"..\..\..\day7input.txt";
+        string path = @"..\..\..\inputs\day7input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
         List<CamelCard> hands = new List<CamelCard>();
@@ -440,7 +438,7 @@ public class Days{
     }
     public static void Day8()
     {
-        string path = @"..\..\..\day8input.txt";
+        string path = @"..\..\..\inputs\day8input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
         string direction = lines[0];
@@ -569,4 +567,58 @@ public class Days{
 
         return nodeMap;
     }
-}
+
+    public static void Day9(){
+        string path = @"..\..\..\inputs\day9input.txt";
+        string[] lines;
+        lines = File.ReadAllLines(path);
+        List<List<long>> longsList = new List<List<long>>();
+        foreach(string line in lines){
+            List<long> longs = new List<long>();
+            MatchCollection matches = Regex.Matches(line, "-?\\d+");
+            foreach (Match match in matches){
+                longs.Add(long.Parse(match.Value));
+                }
+            longsList.Add(longs);
+            }
+            List<long> finalLongs = new List<long>();
+            foreach (List<long> longLine in longsList){
+                List<List<long>> allStages = new List<List<long>>();
+                List<long> newList = longLine;
+                while(!DifferencesAllZero(newList)) {
+                    allStages.Add(newList);
+                    newList = CalculateDifferences(newList);
+                }
+                finalLongs.Add(NextLong(allStages));
+            }
+            long total = 0;
+            foreach(long finalLong in finalLongs){total += finalLong;}
+            Console.WriteLine("the sum of all the next values is " + total);
+        }
+
+    private static List<long> CalculateDifferences (List<long> longs){
+        List<long> differences = new List<long>();
+        for (int i = 0; i < longs.Count - 1; i++){
+            differences.Add(longs[i+1]-longs[i]);
+        }
+        return differences;
+    }
+
+    private static bool DifferencesAllZero(List<long> longs){
+        foreach(long comparedLong in longs){
+            if(comparedLong != 0){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static long NextLong(List<List<long>> differenceLists){
+        long workingLong = 0;
+        for(int i = differenceLists.Count - 1; i >= 0; i--){
+            workingLong += differenceLists[i][differenceLists[i].Count - 1];
+        }
+        return workingLong;
+    }
+
+    }
