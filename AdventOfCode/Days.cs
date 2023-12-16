@@ -582,6 +582,7 @@ public class Days{
             longsList.Add(longs);
             }
             List<long> finalLongs = new List<long>();
+            List<long> previousLongs = new List<long>();
             foreach (List<long> longLine in longsList){
                 List<List<long>> allStages = new List<List<long>>();
                 List<long> newList = longLine;
@@ -590,10 +591,14 @@ public class Days{
                     newList = CalculateDifferences(newList);
                 }
                 finalLongs.Add(NextLong(allStages));
+                previousLongs.Add(PreviousLong(allStages));
             }
             long total = 0;
             foreach(long finalLong in finalLongs){total += finalLong;}
             Console.WriteLine("the sum of all the next values is " + total);
+            total = 0;
+            foreach(long previousLong in previousLongs){total += previousLong;}
+            Console.WriteLine("the sum of all the previous values is " + total);
         }
 
     private static List<long> CalculateDifferences (List<long> longs){
@@ -617,6 +622,14 @@ public class Days{
         long workingLong = 0;
         for(int i = differenceLists.Count - 1; i >= 0; i--){
             workingLong += differenceLists[i][differenceLists[i].Count - 1];
+        }
+        return workingLong;
+    }
+
+    private static long PreviousLong(List<List<long>> differenceLists){
+        long workingLong = 0;
+        for(int i = differenceLists.Count - 1; i >= 0; i--){
+            workingLong = differenceLists[i][0] - workingLong;
         }
         return workingLong;
     }
