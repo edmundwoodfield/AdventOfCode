@@ -634,4 +634,84 @@ public class Days{
         return workingLong;
     }
 
+    public static void Day10(){
+        string path = @"..\..\..\inputs\day10input.txt";
+        string[] lines;
+        lines = File.ReadAllLines(path);
+        List<int> startingLocation = new List<int>();
+        for(int i = 0; i < lines.Length; i++){
+            for(int j = 0; j < lines[i].Length; j++){
+                if(lines[i][j] == 'S'){
+                    startingLocation.Add(i);
+                    startingLocation.Add(j);
+                    break;
+                }
+            }
+        }
+        List<int> currentLocation = startingLocation;
+        List<int> ignorePoints = new List<int>();
+        List<List<int>> route = new List<List<int>>{currentLocation};
+        MakeMove(lines, ref currentLocation, ref ignorePoints, route);
+        while(!(currentLocation[0] == startingLocation[0] && currentLocation[1] == startingLocation[1])){
+        MakeMove(lines, ref currentLocation, ref ignorePoints, route);}
+        Console.WriteLine("total number of steps back to start is " + route.Count);
+        Console.WriteLine("the number of steps to the furthest point is " + route.Count/2);
+
+    }
+
+    private static void MakeMove(string[] lines, ref List<int> currentLocation, ref List<int> ignorePoints, List<List<int>> route)
+    {
+        List<int> nextLocation = IdentifyNextMove(lines, currentLocation, ref ignorePoints);
+        currentLocation = nextLocation;
+        route.Add(currentLocation);        
+    }
+
+
+    private static List<List<int>> GenerateGrid(List<int> startingLocation)
+    {
+        return new List<List<int>>{
+        new List<int>{startingLocation[0]-1,startingLocation[1]},
+        new List<int>{startingLocation[0],startingLocation[1]+1},
+        new List<int>{startingLocation[0]+1,startingLocation[1]},
+        new List<int>{startingLocation[0],startingLocation[1]-1},
+        };
+    }
+    private static readonly List<char> north = new List<char>{'|','7','F','S'};
+    private static readonly List<char> east = new List<char>{'-','J','7','S'};
+    private static readonly List<char> south = new List<char>{'|','L','J','S'};
+    private static readonly List<char> west = new List<char>{'-','L','F','S'};
+    private static List<int> IdentifyNextMove(string[] lines, List<int> startingLocation, ref List<int> ignorePoints)
+    {
+        char shape = lines[startingLocation[0]][startingLocation[1]];
+        switch(shape){
+            case '|': {ignorePoints.Add(1);ignorePoints.Add(3);break;}
+            case '-': {ignorePoints.Add(0);ignorePoints.Add(2);break;}
+            case 'L': {ignorePoints.Add(2);ignorePoints.Add(3);break;}
+            case 'J': {ignorePoints.Add(1);ignorePoints.Add(2);break;}
+            case '7': {ignorePoints.Add(0);ignorePoints.Add(1);break;}
+            case 'F': {ignorePoints.Add(0);ignorePoints.Add(3);break;}
+            default: break;
+        }
+        List<List<int>> compass = GenerateGrid(startingLocation);
+        for(int i = 0; i < 4; i++){
+            List<char>point = new List<char>();
+            if(i == 0){point = north;}
+            else if (i == 1){point = east;}
+            else if (i == 2){point = south;}
+            else if (i == 3){point = west;}
+        if (!ignorePoints.Contains(i)){
+            int ignorePoint;
+        try{if (point.Contains(lines[compass[i][0]][compass[i][1]])){
+            ignorePoint = i+2;
+            if(ignorePoint > 3){
+                ignorePoint -= 4;
+            }
+            ignorePoints = new List<int>{ignorePoint};
+            return compass[i];
+        }}
+        catch{
+        }}
+        }
+        throw new Exception("failed to identify valid move");
+    }
     }
