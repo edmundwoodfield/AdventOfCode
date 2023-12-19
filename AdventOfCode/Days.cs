@@ -767,31 +767,58 @@ public class Days{
         string path = @"..\..\..\inputs\day11input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
-        List<string> rows = ExpandSpace(lines);
-        Dictionary<int, List<int>> starMap = GenerateStarMap(rows);
+        List<string> rows = lines.ToList();
+        List<int> emptyRows = new List<int>();
+        List<int> emptyColumns = new List<int>();
+        ExpandSpace(lines, ref emptyRows, ref emptyColumns);
+        Dictionary<int, List<long>> starMap = GenerateStarMap(rows, emptyRows, emptyColumns, 1);
+        long totalDistances = CalculateTotalDistances(starMap);
+        Console.WriteLine("Total distances between all stars is " + totalDistances);
+        starMap = GenerateStarMap(rows, emptyRows, emptyColumns, 1000000-1); 
+        // the -1 is because 1 become 1m rather than 1+1m, whereas in the first part 1 becomes 1+1
+        totalDistances = CalculateTotalDistances(starMap);
+        Console.WriteLine("Total distances between all stars is " + totalDistances);
+
+
+    }
+
+    private static long CalculateTotalDistances(Dictionary<int, List<long>> starMap)
+    {
         long totalDistances = 0;
-        foreach(int star in starMap.Keys){
+        foreach (int star in starMap.Keys)
+        {
             long distances = 0;
-            foreach(int otherStar in starMap.Keys){
-                distances += Math.Abs(starMap.GetValueOrDefault(star,new List<int>{0,0})[0]-starMap.GetValueOrDefault(otherStar,new List<int>{0,0})[0]);
-                distances += Math.Abs(starMap.GetValueOrDefault(star,new List<int>{0,0})[1]-starMap.GetValueOrDefault(otherStar,new List<int>{0,0})[1]);
+            foreach (int otherStar in starMap.Keys)
+            {
+                distances += Math.Abs(starMap.GetValueOrDefault(star, new List<long> { 0, 0 })[0] - starMap.GetValueOrDefault(otherStar, new List<long> { 0, 0 })[0]);
+                distances += Math.Abs(starMap.GetValueOrDefault(star, new List<long> { 0, 0 })[1] - starMap.GetValueOrDefault(otherStar, new List<long> { 0, 0 })[1]);
             }
             totalDistances += distances;
         }
-        Console.WriteLine("Total distances between all stars is " + totalDistances/2);
+        totalDistances = totalDistances / 2;
+        return totalDistances;
     }
 
-    private static Dictionary<int, List<int>> GenerateStarMap(List<string> rows)
+    private static Dictionary<int, List<long>> GenerateStarMap(List<string> rows, List<int> emptyRows, List<int> emptyColumns, long expansionSize)
     {
-        Dictionary<int, List<int>> starMap = new Dictionary<int, List<int>>();
+        Dictionary<int, List<long>> starMap = new Dictionary<int, List<long>>();
         int counter = 0;
         for (int i = 0; i < rows.Count; i++)
-        {
+        {        
+            long iExpansion = 0;
+            foreach(int emptyInt in emptyRows){
+                if(i >= emptyInt){iExpansion += expansionSize;}
+            }
             for (int j = 0; j < rows[0].Length; j++)
             {
+                long jExpansion = 0;
+                foreach(int emptyInt in emptyColumns){
+                if(j >= emptyInt){jExpansion += expansionSize;}
+                }
+
                 if (rows[i][j] == '#')
                 {
-                    starMap.Add(counter, new List<int> { i, j });
+                    starMap.Add(counter, new List<long> { i + iExpansion, j + jExpansion});
                     counter++;
                 }
             }
@@ -799,9 +826,10 @@ public class Days{
         return starMap;
     }
 
-    private static List<string> ExpandSpace(string[] lines)
+    private static void ExpandSpace(string[] lines, ref List<int> emptyRows, ref List<int> emptyColumns)
     {
-        List<string> rows = new List<string>();
+        
+        List<int> emptyRowIndices = new List<int>();
         for (int i = 0; i < lines.Length; i++)
         {
             bool empty = true;
@@ -812,10 +840,10 @@ public class Days{
                     empty = false;
                 }
             }
-            if (empty) { rows.Add(lines[i]); rows.Add(lines[i]); }
-            else { rows.Add(lines[i]); }
+            if (empty) {emptyRowIndices.Add(i);}
         }
-        List<int> emptyIndices = new List<int>();
+        emptyRows = emptyRowIndices;
+        List<int> emptyColumnIndices = new List<int>();
         for (int i = 0; i < lines[0].Length; i++)
         {
             bool empty = true;
@@ -826,17 +854,8 @@ public class Days{
                     empty = false;
                 }
             }
-            if (empty) { emptyIndices.Add(i); }
+            if (empty) { emptyColumnIndices.Add(i); }
         }
-        int counter = 0;
-        foreach (int index in emptyIndices)
-        {
-            for (int i = 0; i < rows.Count; i++)
-            {
-                rows[i] = rows[i].Substring(0, index+counter) + '.' + rows[i].Substring(index+counter);
-            }
-            counter++;
-        }
-        return rows;
+        emptyColumns = emptyColumnIndices;
     }
 }
