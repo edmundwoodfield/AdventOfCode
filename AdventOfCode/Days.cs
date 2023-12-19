@@ -656,6 +656,54 @@ public class Days{
         MakeMove(lines, ref currentLocation, ref ignorePoints, route);}
         Console.WriteLine("total number of steps back to start is " + route.Count);
         Console.WriteLine("the number of steps to the furthest point is " + route.Count/2);
+        lines = ReplaceStartWithShape(lines,route);
+        long inside = CountInsideCoords(lines,route);
+        Console.WriteLine("the number of squares inside the pipes is " + inside);
+
+    }
+
+    private static long CountInsideCoords(string[] lines, List<List<int>> route)
+    {
+        List<char> verticals = new List<char>{'|','J','7','F','L'};
+        long total = 0;
+        for(int i = 0; i < lines.Length; i++){
+            bool inside = false;
+            char switchChar = '-';
+            for(int j = 0; j < lines[i].Length; j++){
+                char examinedChar = lines[i][j];
+                if(route.Any(p => p[0] == i && p[1] == j)){
+                    if(verticals.Contains(examinedChar) && (!(switchChar == 'F' && examinedChar == '7')) && (!(switchChar == 'L' && examinedChar == '7'))){
+                    switchChar = examinedChar;
+                    if(examinedChar != 'F'){
+                    inside = !inside;}}
+                    else if (verticals.Contains(examinedChar)){switchChar = examinedChar;}}
+
+                
+                if(inside && !route.Any(p => p[0] == i && p[1] == j)){
+                    total++;};
+            }
+
+        }
+        return total;
+    }
+    
+
+    private static string[] ReplaceStartWithShape(string[] lines, List<List<int>> route){
+        string[] output = lines;
+        List<int> s = route[0];
+        List<int> first = route[1];
+        List<int> last = route[route.Count-2];
+        char shape;
+        if(first[1] == last[1]){shape = '|';}
+        else if(first[0] == last[0]){shape = '-';}
+        else if ((first[0]-last[0] == 1 && first[1]-last[1]== 1 && first[0]==s[0])||(last[0]-first[0] == 1 && last[1]-first[1] == 1 && last[0]==s[0])){shape = 'L';}
+        else if ((first[0]-last[0] == 1 && last[1]-first[1]== 1 && first[0]==s[0])||(last[0]-first[0] == 1 && first[1]-last[1] == 1 && last[0]==s[0])){shape = 'J';}
+        else if ((first[0]-last[0] == 1 && first[1]-last[1]== 1 && first[1]==s[1])||(last[0]-first[0] == 1 && last[1]-first[1] == 1 && last[1]==s[1])){shape = '7';}
+        else if ((first[0]-last[0] == 1 && last[1]-first[1]== 1 && first[1]==s[1])||(last[0]-first[0] == 1 && first[1]-last[1] == 1 && last[1]==s[1])){shape = 'F';}
+        else throw new Exception("failed to replace S");
+        string newLine = output[s[0]].Substring(0,s[1])+shape+output[s[0]].Substring(s[1]+1,output[s[0]].Length-s[1]-1);
+        output[s[0]]=newLine;
+        return output;
 
     }
 
