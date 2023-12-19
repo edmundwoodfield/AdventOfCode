@@ -762,4 +762,81 @@ public class Days{
         }
         throw new Exception("failed to identify valid move");
     }
+    public static void Day11()
+    {
+        string path = @"..\..\..\inputs\day11input.txt";
+        string[] lines;
+        lines = File.ReadAllLines(path);
+        List<string> rows = ExpandSpace(lines);
+        Dictionary<int, List<int>> starMap = GenerateStarMap(rows);
+        long totalDistances = 0;
+        foreach(int star in starMap.Keys){
+            long distances = 0;
+            foreach(int otherStar in starMap.Keys){
+                distances += Math.Abs(starMap.GetValueOrDefault(star,new List<int>{0,0})[0]-starMap.GetValueOrDefault(otherStar,new List<int>{0,0})[0]);
+                distances += Math.Abs(starMap.GetValueOrDefault(star,new List<int>{0,0})[1]-starMap.GetValueOrDefault(otherStar,new List<int>{0,0})[1]);
+            }
+            totalDistances += distances;
+        }
+        Console.WriteLine("Total distances between all stars is " + totalDistances/2);
     }
+
+    private static Dictionary<int, List<int>> GenerateStarMap(List<string> rows)
+    {
+        Dictionary<int, List<int>> starMap = new Dictionary<int, List<int>>();
+        int counter = 0;
+        for (int i = 0; i < rows.Count; i++)
+        {
+            for (int j = 0; j < rows[0].Length; j++)
+            {
+                if (rows[i][j] == '#')
+                {
+                    starMap.Add(counter, new List<int> { i, j });
+                    counter++;
+                }
+            }
+        }
+        return starMap;
+    }
+
+    private static List<string> ExpandSpace(string[] lines)
+    {
+        List<string> rows = new List<string>();
+        for (int i = 0; i < lines.Length; i++)
+        {
+            bool empty = true;
+            foreach (char character in lines[i])
+            {
+                if (character != '.')
+                {
+                    empty = false;
+                }
+            }
+            if (empty) { rows.Add(lines[i]); rows.Add(lines[i]); }
+            else { rows.Add(lines[i]); }
+        }
+        List<int> emptyIndices = new List<int>();
+        for (int i = 0; i < lines[0].Length; i++)
+        {
+            bool empty = true;
+            foreach (string line in lines)
+            {
+                if (line[i] != '.')
+                {
+                    empty = false;
+                }
+            }
+            if (empty) { emptyIndices.Add(i); }
+        }
+        int counter = 0;
+        foreach (int index in emptyIndices)
+        {
+            for (int i = 0; i < rows.Count; i++)
+            {
+                rows[i] = rows[i].Substring(0, index+counter) + '.' + rows[i].Substring(index+counter);
+            }
+            counter++;
+        }
+        return rows;
+    }
+}
