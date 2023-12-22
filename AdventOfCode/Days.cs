@@ -976,44 +976,112 @@ long GetCount(string springs, List<int> groups)
 }
 
     }
-    public static void Day13(){
+    public static void Day13()
+    {
         string path = @"..\..\..\inputs\day13input.txt";
         string[] lines;
         lines = File.ReadAllLines(path);
         List<List<string>> patternsList = new List<List<string>>();
+        Day13PopulatePatternsList(lines, patternsList);
+        Dictionary<int, int[]> patternDictionary = new Dictionary<int, int[]>();
+        long total = 0;
+        for (int p = 0; p < patternsList.Count; p++)
+        {
+            var currentPattern = patternsList[p];
+            int[] indices = Day13CalculateMirror(currentPattern, 0, 0);
+            total += indices[0] + indices[1] * 100;
+            patternDictionary.Add(p, indices);
+        }
+        Console.WriteLine("part 1 total is " + total);
+        total = Day13Part2Calculation(patternsList, patternDictionary);
+        Console.WriteLine("part 2 total is " + total);
+    }
+
+    private static long Day13Part2Calculation(List<List<string>> patternsList, Dictionary<int, int[]> patternDictionary)
+    {
+        long total = 0;
+        for (int p = 0; p < patternsList.Count; p++)
+        {
+            int subtotal = 0;
+            var currentPattern = patternsList[p];
+            for (int i = 0; i < currentPattern.Count; i++)
+            {
+                for (int j = 0; j < currentPattern[0].Length; j++)
+                {
+                    var copyOfPattern = new List<string>(currentPattern);
+                    char reversedChar;
+                    int ignoreVertical = patternDictionary.GetValueOrDefault(p, new int[] { 0, 0 })[0];
+                    int ignoreHorizontal = patternDictionary.GetValueOrDefault(p, new int[] { 0, 0 })[1];
+                    if (currentPattern[i][j] == '.') { reversedChar = '#'; } else { reversedChar = '.'; }
+                    copyOfPattern[i] = currentPattern[i][..j] + reversedChar + currentPattern[i][(j + 1)..];
+                    int[] indices = Day13CalculateMirror(copyOfPattern, ignoreVertical, ignoreHorizontal);
+                    if (indices[0] + indices[1] != 0)
+                    {
+                        subtotal += indices[0] + indices[1] * 100;
+                        break;
+                    }
+                    if (subtotal != 0) break;
+                }
+                if (subtotal != 0) break;
+            }
+            total += subtotal;
+        }
+
+        return total;
+    }
+
+
+
+    private static int[] Day13CalculateMirror(List<string> currentPattern, int ignoreVertical, int ignoreHorizontal)
+    {
+        int verticalIndex = 0;
+        int horizontalIndex = 0;
+        for (int i = 1; i < currentPattern[0].Length; i++)
+        if (i != ignoreVertical)
+        {
+            bool mirror = true;
+            for (int j = 0; i - j > 0 && i + j < currentPattern[0].Length; j++)
+            {
+                for (int k = 0; k < currentPattern.Count; k++)
+                {
+                    if (currentPattern[k][i - j - 1] != currentPattern[k][i + j]) { mirror = false; continue; }
+                }
+            }
+            if (mirror)
+            {
+                verticalIndex += i;
+            }
+        }
+        for (int i = 1; i < currentPattern.Count; i++)
+        if(i != ignoreHorizontal)
+        {
+            
+            bool mirror = true;
+            for (int j = 0; i - j > 0 && i + j < currentPattern.Count; j++)
+            {
+                for (int k = 0; k < currentPattern[0].Length; k++)
+                {
+                    if (currentPattern[i - j - 1][k] != currentPattern[i + j][k]) { mirror = false; continue; }
+                }
+            }
+            if (mirror)
+            {
+                horizontalIndex += i;
+            }
+        }
+
+        return [verticalIndex,horizontalIndex];
+    }
+
+    private static void Day13PopulatePatternsList(string[] lines, List<List<string>> patternsList)
+    {
         List<string> pattern = new List<string>();
-        foreach(string line in lines){
-            if(line.Equals("")){patternsList.Add(pattern); pattern = new List<string>();}
-            else{pattern.Add(line);}
+        foreach (string line in lines)
+        {
+            if (line.Equals("")) { patternsList.Add(pattern); pattern = new List<string>(); }
+            else { pattern.Add(line); }
         }
         patternsList.Add(pattern);
-        long total = 0;
-        for(int p = 0; p < patternsList.Count; p++){
-            var currentPattern = patternsList[p];
-            for(int i = 1; i < currentPattern[0].Length; i++){
-                bool mirror = true;
-                for (int j = 0; i-j > 0 && i+j < currentPattern[0].Length; j++){
-                    for(int k = 0; k < currentPattern.Count; k++){
-                        if(currentPattern[k][i-j-1] != currentPattern[k][i+j]){mirror = false;}
-                    }
-                }
-                if(mirror){
-                    total+=i;
-                    Console.WriteLine("vertical mirror found for " + p + " at " + i);}
-            }
-            for(int i = 1; i < currentPattern.Count; i++){
-                bool mirror = true;
-                for (int j = 0; i-j > 0 && i+j < currentPattern.Count; j++){
-                    for(int k = 0; k < currentPattern[0].Length; k++){
-                        if(currentPattern[i-j-1][k] != currentPattern[i+j][k]){mirror = false;}
-                    }
-                }
-                if(mirror){
-                    total+=i*100;
-                    Console.WriteLine("horizontal mirror found for " + p + " at " + i);
-                }
-            }
-        }
-        Console.WriteLine("total is " + total);
-        }
     }
+}
+
